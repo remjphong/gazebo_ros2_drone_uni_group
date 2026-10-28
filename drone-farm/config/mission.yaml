@@ -14,6 +14,9 @@ mission:
   # Local offsets relative to the initial GPS position.
   # north_m: positive = north
   # east_m: positive = east
+  #
+  # Manual fallback route. scripts/plan_route.py ignores this list and
+  # generates its own waypoints from `targets` and `obstacles` below.
   waypoints:
     - north_m: 0.0
       east_m: 5.0
@@ -30,3 +33,34 @@ mission:
 safety:
   global_position_timeout_seconds: 60
   mission_timeout_seconds: 180
+
+# ---------------------------------------------------------------------
+# Path planner inputs (used by scripts/plan_route.py)
+# All positions are north/east offsets in metres from the drone's start.
+# ---------------------------------------------------------------------
+planner:
+  resolution_m: 0.5      # grid cell size; smaller = finer paths, slower
+  safety_margin_m: 1.0   # clearance kept around every obstacle
+  # Flight area. The planner never leaves this rectangle.
+  min_north_m: -5.0
+  max_north_m: 20.0
+  min_east_m: -5.0
+  max_east_m: 20.0
+
+# Circular no-go zones. The entry below is a PLACEHOLDER: replace it with
+# real objects measured in the Gazebo world.
+obstacles:
+  - north_m: 4.0
+    east_m: 5.0
+    radius_m: 1.5
+
+# Places the drone should visit, in order. It starts at (0, 0).
+targets:
+  - north_m: 0.0
+    east_m: 5.0
+  - north_m: 8.0
+    east_m: 5.0
+  - north_m: 8.0
+    east_m: 0.0
+  - north_m: 0.0
+    east_m: 0.0

@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<!--
+  Obstacle matching the placeholder in config/mission.yaml:
+    north_m: 4.0, east_m: 5.0, radius_m: 1.5
+
+  Gazebo world frame (ENU): x = east, y = north, z = up.
+  The planner measures offsets from the drone's start, so this pose
+  assumes the drone spawns at the world origin (0, 0):
+    x = east_m = 5.0, y = north_m = 4.0
+  If you spawn the drone elsewhere, ADD the spawn x/y to this pose.
+-->
+<sdf version="1.9">
+  <model name="obstacle_1">
+    <static>true</static>
+    <!-- z = height / 2 so the base of the cylinder sits at z = 0 -->
+    <pose>5.0 4.0 5.0 0 0 0</pose>
+
+    <link name="link">
+      <!-- The real obstacle: radius 1.5 m, 10 m tall so it also blocks
+           flights at 5 m altitude. -->
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+            <radius>1.5</radius>
+            <length>10.0</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>1.5</radius>
+            <length>10.0</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.8 0.2 0.1 1</ambient>
+          <diffuse>0.8 0.2 0.1 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- Planner safety margin (1.0 m): radius 1.5 + 1.0 = 2.5 m.
+           Visual only, no collision. The planned path should stay
+           outside this ring. -->
+      <visual name="safety_margin">
+        <geometry>
+          <cylinder>
+            <radius>2.5</radius>
+            <length>0.05</length>
+          </cylinder>
+        </geometry>
+        <pose>0 0 -4.95 0 0 0</pose>
+        <material>
+          <ambient>1 0.8 0 1</ambient>
+          <diffuse>1 0.8 0 1</diffuse>
+        </material>
+        <transparency>0.6</transparency>
+      </visual>
+    </link>
+  </model>
+</sdf>
