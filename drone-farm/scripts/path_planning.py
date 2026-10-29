@@ -30,6 +30,34 @@ class Obstacle:
         if self.radius_m < 0:
             raise ValueError("Obstacle radius must not be negative.")
 
+    def distance_to(self, p: "Point2D") -> float:
+        """Distance from p to the obstacle's surface (negative inside)."""
+        return _distance(p, self.center) - self.radius_m
+
+
+@dataclass(frozen=True)
+class RectObstacle:
+    """Axis-aligned rectangle (crop row, building, ...).
+
+    size_north_m is the length along north, size_east_m the width along east.
+    """
+
+    center: Point2D
+    size_north_m: float
+    size_east_m: float
+
+    def __post_init__(self):
+        if self.size_north_m <= 0 or self.size_east_m <= 0:
+            raise ValueError("Rectangle sizes must be greater than zero.")
+
+    def distance_to(self, p: "Point2D") -> float:
+        """Distance from p to the rectangle's surface (negative inside)."""
+        dn = abs(p.north_m - self.center.north_m) - self.size_north_m / 2.0
+        de = abs(p.east_m - self.center.east_m) - self.size_east_m / 2.0
+        if dn > 0 or de > 0:
+            return math.hypot(max(dn, 0.0), max(de, 0.0))
+        return max(dn, de)
+
 
 @dataclass
 class PlannerConfig:
@@ -67,7 +95,7 @@ def _distance(a: Point2D, b: Point2D) -> float:
 class PathPlanner:
     def __init__(self, config: PlannerConfig):
         self.config = config
-        self.obstacles: list[Obstacle] = []
+        self.obstacles: list = []
 
         self.rows = int(
             math.floor(
@@ -83,7 +111,8 @@ class PathPlanner:
     # ------------------------------------------------------------------
     # Obstacles and collision checks
     # ------------------------------------------------------------------
-    def add_obstacle(self, obstacle: Obstacle) -> None:
+    def add_obstacle(self, obstacle) -> None:
+        """Add an Obstacle (circle) or RectObstacle (rectangle)."""
         self.obstacles.append(obstacle)
 
     def clear_obstacles(self) -> None:
@@ -103,10 +132,8 @@ class PathPlanner:
             return False
 
         for obstacle in self.obstacles:
-            if (
-                _distance(p, obstacle.center)
-                < obstacle.radius_m + cfg.safety_margin_m
-            ):
+            # Tiny tolerance so points exactly on the margin count as free.
+            if obstacle.distance_to(p) < cfg.safety_margin_m - 1e-9:
                 return False
         return True
 

@@ -5,7 +5,7 @@ connection:
   timeout_seconds: 20
 
 mission:
-  altitude_m: 5.0
+  altitude_m: 1.0
   speed_m_s: 2.0
 
   # Return to launch after completing all waypoints.
@@ -41,26 +41,56 @@ safety:
 planner:
   resolution_m: 0.5      # grid cell size; smaller = finer paths, slower
   safety_margin_m: 1.0   # clearance kept around every obstacle
-  # Flight area. The planner never leaves this rectangle.
+  # Flight area. Must match the `flight_zone` box in obstacle_course.sdf
+  # (everything outside it is red in Gazebo).
   min_north_m: -5.0
-  max_north_m: 20.0
+  max_north_m: 22.0
   min_east_m: -5.0
-  max_east_m: 20.0
+  max_east_m: 27.0
 
-# Circular no-go zones. The entry below is a PLACEHOLDER: replace it with
-# real objects measured in the Gazebo world.
+# No-go zones. Two kinds (positions are the centre):
+#   circle:    north_m, east_m, radius_m
+#   rectangle: north_m, east_m, size_north_m (length), size_east_m (width)
+# Must match the models in obstacle_course.sdf.
 obstacles:
+  # obstacle_1 (tall pole)
   - north_m: 4.0
     east_m: 5.0
     radius_m: 1.5
+  # crop_row_1..4 (15 m x 1 m)
+  - north_m: 9.5
+    east_m: 10.0
+    size_north_m: 15.0
+    size_east_m: 1.0
+  - north_m: 9.5
+    east_m: 14.0
+    size_north_m: 15.0
+    size_east_m: 1.0
+  - north_m: 9.5
+    east_m: 18.0
+    size_north_m: 15.0
+    size_east_m: 1.0
+  - north_m: 9.5
+    east_m: 22.0
+    size_north_m: 15.0
+    size_east_m: 1.0
 
-# Places the drone should visit, in order. It starts at (0, 0).
+# Survey route, in order. It starts at (0, 0) and flies along the aisles
+# BETWEEN the crop rows (rows at east 10, 14, 18, 22 -> aisle centres at
+# east 12, 16, 20; north 2..17), alternating direction, with a waypoint
+# at both ends and the middle of each aisle, then returns home.
 targets:
-  - north_m: 0.0
-    east_m: 5.0
-  - north_m: 8.0
-    east_m: 5.0
-  - north_m: 8.0
-    east_m: 0.0
+  - north_m: 2.0
+    east_m: 12.0
+  - north_m: 17.0
+    east_m: 12.0
+  - north_m: 17.0
+    east_m: 16.0
+  - north_m: 2.0
+    east_m: 16.0
+  - north_m: 2.0
+    east_m: 20.0
+  - north_m: 17.0
+    east_m: 20.0
   - north_m: 0.0
     east_m: 0.0

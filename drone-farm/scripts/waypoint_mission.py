@@ -10,7 +10,7 @@ import yaml
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CONFIG_PATH = PROJECT_ROOT / "config" / "mission.yaml"
+CONFIG_PATH = PROJECT_ROOT / "config" / "planned_mission.yaml"
 
 def load_config():
     with CONFIG_PATH.open("r", encoding="utf-8") as file:

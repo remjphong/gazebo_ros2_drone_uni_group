@@ -20,6 +20,7 @@ from path_planning import (
     PathPlanner,
     PlannerConfig,
     Point2D,
+    RectObstacle,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -89,9 +90,27 @@ def build_planner(config):
     for index, entry in enumerate(config.get("obstacles") or [], start=1):
         where = f"Obstacle {index}"
         center = load_point(entry, where)
-        radius = number(entry, "radius_m", where)
+        is_circle = "radius_m" in entry
+        is_rect = "size_north_m" in entry or "size_east_m" in entry
+
+        if is_circle == is_rect:
+            raise ConfigError(
+                f"{where} must define either radius_m (circle) or both "
+                "size_north_m and size_east_m (rectangle), not both/neither."
+            )
         try:
-            planner.add_obstacle(Obstacle(center, radius))
+            if is_circle:
+                planner.add_obstacle(
+                    Obstacle(center, number(entry, "radius_m", where))
+                )
+            else:
+                planner.add_obstacle(
+                    RectObstacle(
+                        center,
+                        number(entry, "size_north_m", where),
+                        number(entry, "size_east_m", where),
+                    )
+                )
         except ValueError as error:
             raise ConfigError(f"{where}: {error}") from None
 

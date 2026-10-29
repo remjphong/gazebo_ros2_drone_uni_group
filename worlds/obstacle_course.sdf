@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Flat obstacle-course world, based on PX4's default world.
-     File name must be obstacle_course.sdf (matches the world name below).
-     Frame: x = east, y = north, z = up; drone assumed to spawn at (0, 0). -->
+<!-- obstacle_course world (file name must be obstacle_course.sdf). -->
 <sdf version="1.9">
   <world name="obstacle_course">
     <physics type="ode">
@@ -44,9 +42,9 @@
             </plane>
           </geometry>
           <material>
-            <ambient>0.8 0.8 0.8 1</ambient>
-            <diffuse>0.8 0.8 0.8 1</diffuse>
-            <specular>0.8 0.8 0.8 1</specular>
+            <ambient>0.75 0.1 0.1 1</ambient>
+            <diffuse>0.75 0.1 0.1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
           </material>
         </visual>
         <pose>0 0 0 0 -0 0</pose>
@@ -93,9 +91,88 @@
       <longitude_deg> 8.546163739800146</longitude_deg>
       <elevation>488</elevation>
     </spherical_coordinates>
-    <!-- ===== OBSTACLES =====
-         One <model> per obstacle. Keep these in sync with `obstacles:` in
-         config/mission.yaml (x = east_m, y = north_m, radius = radius_m). -->
+    <!-- Frame: x = east, y = north, z = up; drone assumed to spawn at (0, 0).
+         Keep zone, rows and obstacles in sync with config/mission.yaml. -->
+    <model name="flight_zone">
+      <!-- Visual only (no collision). Covers exactly the planner bounds in
+           config/mission.yaml. Outside it the ground stays red.
+           Change the colour below (e.g. 0.3 0.8 0.3) to paint the zone green. -->
+      <static>true</static>
+      <pose>11.0 8.5 0.01 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>32.0 27.0 0.02</size></box></geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="crop_row_1">
+      <static>true</static>
+      <pose>10.0 9.5 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="crop_row_2">
+      <static>true</static>
+      <pose>14.0 9.5 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="crop_row_3">
+      <static>true</static>
+      <pose>18.0 9.5 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="crop_row_4">
+      <static>true</static>
+      <pose>22.0 9.5 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
     <model name="obstacle_1">
         <static>true</static>
         <!-- z = height / 2 so the base of the cylinder sits at z = 0 -->
