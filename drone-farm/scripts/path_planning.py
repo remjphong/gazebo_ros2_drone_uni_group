@@ -96,6 +96,7 @@ class PathPlanner:
     def __init__(self, config: PlannerConfig):
         self.config = config
         self.obstacles: list = []
+        self.occupancy = None  # optional OccupancyGrid built from sensor data
 
         self.rows = int(
             math.floor(
@@ -118,6 +119,14 @@ class PathPlanner:
     def clear_obstacles(self) -> None:
         self.obstacles.clear()
 
+    def set_occupancy_grid(self, grid) -> None:
+        """Also avoid everything an OccupancyGrid (e.g. from a lidar) has seen.
+
+        Unknown space counts as free, so the planner only avoids what the
+        sensor has actually detected.
+        """
+        self.occupancy = grid
+
     def is_point_free(self, p: Point2D) -> bool:
         """True if a drone centred at p is inside the flight area and at
         least safety_margin_m away from every obstacle."""
@@ -135,6 +144,11 @@ class PathPlanner:
             # Tiny tolerance so points exactly on the margin count as free.
             if obstacle.distance_to(p) < cfg.safety_margin_m - 1e-9:
                 return False
+
+        if self.occupancy is not None and self.occupancy.is_blocked(
+            p.north_m, p.east_m, cfg.safety_margin_m
+        ):
+            return False
         return True
 
     def is_segment_free(self, a: Point2D, b: Point2D) -> bool:
@@ -181,13 +195,24 @@ class PathPlanner:
     # ------------------------------------------------------------------
     # Planning
     # ------------------------------------------------------------------
-    def plan(self, start: Point2D, goal: Point2D) -> Optional[list[Point2D]]:
+    def plan(
+        self,
+        start: Point2D,
+        goal: Point2D,
+        allow_blocked_start: bool = False,
+    ) -> Optional[list[Point2D]]:
         """A* search from start to goal.
 
         Returns the waypoints to fly AFTER start (the last one is the goal),
         or None if start/goal are blocked or no path exists.
+
+        allow_blocked_start lets the search begin inside a safety margin
+        (for example a drone that ended up close to a sensed obstacle), so
+        it can find its way out instead of giving up.
         """
-        if not self.is_point_free(start) or not self.is_point_free(goal):
+        if not self.is_point_free(goal):
+            return None
+        if not allow_blocked_start and not self.is_point_free(start):
             return None
 
         # Straight line is free: no search needed.
@@ -197,9 +222,10 @@ class PathPlanner:
         start_cell = self._to_cell(start)
         goal_cell = self._to_cell(goal)
 
-        if not self._is_cell_free(*start_cell) or not self._is_cell_free(
-            *goal_cell
-        ):
+        if not self._is_cell_free(*goal_cell):
+            return None
+        start_blocked = not self._is_cell_free(*start_cell)
+        if start_blocked and not allow_blocked_start:
             return None
 
         res = self.config.resolution_m
@@ -237,8 +263,11 @@ class PathPlanner:
                     if neighbor in closed or not self._is_cell_free(*neighbor):
                         continue
 
-                    # Do not cut diagonally between two blocked cells.
-                    if dr != 0 and dc != 0:
+                    # Do not cut diagonally between two blocked cells
+                    # (except when stepping out of a blocked start cell:
+                    # a boxed-in start must be allowed to leave).
+                    escaping = start_blocked and current == start_cell
+                    if dr != 0 and dc != 0 and not escaping:
                         if not self._is_cell_free(
                             row + dr, col
                         ) or not self._is_cell_free(row, col + dc):

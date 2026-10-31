@@ -57,7 +57,7 @@ obstacles:
   - north_m: 4.0
     east_m: 5.0
     radius_m: 1.5
-  # crop_row_1..4 (15 m x 1 m)
+  # crop_row_1..4 (15 m x 2 m)
   - north_m: 9.5
     east_m: 10.0
     size_north_m: 15.0
