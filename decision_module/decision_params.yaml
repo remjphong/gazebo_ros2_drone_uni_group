@@ -1,0 +1,7 @@
+
+decision_node:
+  ros__parameters:
+    battery_return_threshold_percent: 25.0
+    input_timeout_sec: 3.0
+    decision_rate_hz: 2.0
+

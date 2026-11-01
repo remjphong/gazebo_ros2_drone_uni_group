@@ -1,0 +1,11 @@
+decision_node:
+  ros__parameters:
+
+    # Demo threshold. The group must confirm this value.
+    battery_return_threshold_percent: 25.0
+
+    # Input data older than this is considered stale.
+    input_timeout_sec: 3.0
+
+    # Decision evaluation frequency.
+    decision_rate_hz: 2.0
