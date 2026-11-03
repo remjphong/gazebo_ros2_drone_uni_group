@@ -134,6 +134,8 @@ CONDITIONS = [
      "strong tilt (roll or pitch above 12 degrees)"),
     ("turn", lambda f: f["yaw_rate"] > 40.0,
      "fast turning (above 40 degrees per second)"),
+    ("vturn", lambda f: f["yaw_rate"] > 100.0,
+     "very fast turning (above 100 degrees per second)"),
     ("stopstate", lambda f: bool(f["states"] & STOP_STATES),
      "a stop/turn state (braking, turning, wait-map, creep, settle, look-around)"),
     ("fast", lambda f: f["speed"] > 1.5,
@@ -170,21 +172,25 @@ EXPLANATIONS = {
         "Position telemetry arrives late, so the controller reacts to old "
         "data.",
         "Raise the telemetry rate or reduce load on the program."),
+    "vturn": (
+        "The drone spins very fast (a step in the yaw setpoint). Fast yaw "
+        "uses up motor headroom, so the drone loses lift while it turns.",
+        "Limit the yaw rate (online_navigation.py --yaw-rate, default 70; try "
+        "40 if sags remain). Make sure --no-shaping is not set."),
     "brake": (
         "The drone is slowed abruptly (setpoint snapped back to its own "
         "position at speed), PX4 pitches back hard, and some lift is lost.",
-        "Brake gradually: ramp the setpoint lead down, or use velocity "
-        "setpoints with an acceleration limit. Lowering PX4's MPC_ACC_HOR "
-        "and MPC_TILTMAX_AIR also helps."),
+        "Brake more gently: lower --accel (default 1.5). Lowering PX4's "
+        "MPC_ACC_HOR and MPC_TILTMAX_AIR also helps."),
     "tilt": (
         "The drone leans hard (fast acceleration or braking), which costs "
         "vertical thrust.",
-        "Limit horizontal acceleration: a lower --speed, a gradual speed "
-        "ramp, or lower MPC_ACC_HOR / MPC_TILTMAX_AIR in PX4."),
+        "Limit horizontal acceleration: lower --accel or --speed, or lower "
+        "MPC_ACC_HOR / MPC_TILTMAX_AIR in PX4."),
     "turn": (
         "Fast yawing coincides with the sag.",
-        "Turn more slowly (limit the yaw rate, MPC_YAWRAUTO_MAX) or only "
-        "turn while hovering."),
+        "Turn more slowly (--yaw-rate, PX4's MPC_YAWRAUTO_MAX) or only turn "
+        "while hovering."),
     "stopstate": (
         "The sag follows the drone stopping or turning in place.",
         "Check which of these states it is (see the table) and smooth that "
@@ -373,7 +379,11 @@ def plot(rows, events, path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("log", type=Path, help="flight log CSV")
+    parser.add_argument("log", type=Path, nargs="?",
+                        default=Path(__file__).resolve().parent
+                        / "flight_logs" / "last_flight.csv",
+                        help="flight log CSV (default: flight_logs/"
+                             "last_flight.csv, the log of the latest flight)")
     parser.add_argument("--threshold", type=float, default=0.25,
                         help="how far below the target height counts as a "
                              "sag, in metres (default 0.25)")

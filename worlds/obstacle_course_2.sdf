@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <world name="obstacle_course_2">
+
+    <!-- ===================================================== -->
+    <!-- PHYSICS                                               -->
+    <!-- ===================================================== -->
+
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type="adiabatic"/>
+
+    <scene>
+      <grid>false</grid>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+
+      <shadows>true</shadows>
+    </scene>
+
+    <!-- ===================================================== -->
+    <!-- GROUND                                                -->
+    <!-- ===================================================== -->
+
+    <model name="ground_plane">
+      <static>true</static>
+
+      <link name="link">
+
+        <collision name="collision">
+          <pose>0 0 -5 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>100000 100000 10</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>500 500</size>
+            </plane>
+          </geometry>
+
+          <material>
+            <ambient>0.75 0.1 0.1 1</ambient>
+            <diffuse>0.75 0.1 0.1 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- ===================================================== -->
+    <!-- SUN                                                   -->
+    <!-- ===================================================== -->
+
+    <light name="sunUTC" type="directional">
+      <pose>0 0 500 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+
+      <direction>0.001 0.625 -0.78</direction>
+
+      <diffuse>0.904 0.904 0.904 1</diffuse>
+      <specular>0.271 0.271 0.271 1</specular>
+
+      <attenuation>
+        <range>2000</range>
+        <linear>0</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+    </light>
+
+    <!-- ===================================================== -->
+    <!-- GEOGRAPHIC REFERENCE                                  -->
+    <!-- ===================================================== -->
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+
+      <latitude_deg>47.397971057728974</latitude_deg>
+      <longitude_deg>8.546163739800146</longitude_deg>
+      <elevation>488</elevation>
+    </spherical_coordinates>
+
+    <!-- ===================================================== -->
+    <!-- FLIGHT ZONE                                           -->
+    <!-- ===================================================== -->
+
+    <!--
+      Bounds:
+      X: -5 to 31
+      Y: -4.5 to 27.5
+
+      Planner and mission configuration should use these bounds.
+    -->
+
+    <model name="flight_zone">
+      <static>true</static>
+
+      <pose>13 11.5 0.01 0 0 0</pose>
+
+      <link name="link">
+        <visual name="visual">
+
+          <geometry>
+            <box>
+              <size>36 32 0.02</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.3 0.6 0.3 1</ambient>
+            <diffuse>0.3 0.6 0.3 1</diffuse>
+          </material>
+
+        </visual>
+      </link>
+    </model>
+
+    <!-- ===================================================== -->
+    <!-- CROP ROWS                                             -->
+    <!-- ===================================================== -->
+
+    <!-- Crop rows extend along Y. -->
+
+    <model name="crop_row_1">
+      <static>true</static>
+      <pose>8 11.5 2 0 0 0</pose>
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="crop_row_2">
+      <static>true</static>
+      <pose>12 11.5 2 0 0 0</pose>
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="crop_row_3">
+      <static>true</static>
+      <pose>16 11.5 2 0 0 0</pose>
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="crop_row_4">
+      <static>true</static>
+      <pose>20 11.5 2 0 0 0</pose>
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="crop_row_5">
+      <static>true</static>
+      <pose>24 11.5 2 0 0 0</pose>
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="crop_row_6">
+      <static>true</static>
+      <pose>28 11.5 2 0 0 0</pose>
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 16 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.1 0.4 0.1 1</ambient>
+            <diffuse>0.1 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ===================================================== -->
+    <!-- CYLINDRICAL OBSTACLES                                 -->
+    <!-- ===================================================== -->
+
+    <!-- Obstacle 1: tall cylinder near the entrance. -->
+
+    <model name="obstacle_1">
+      <static>true</static>
+      <pose>5 4 5 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>1.5</radius>
+              <length>10</length>
+            </cylinder>
+          </geometry>
+
+          <material>
+            <ambient>0.8 0.2 0.1 1</ambient>
+            <diffuse>0.8 0.2 0.1 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- Obstacle 2: small cylinder between crop rows. -->
+
+    <model name="obstacle_2">
+      <static>true</static>
+      <pose>14 4 2 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>1</radius>
+              <length>4</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>1</radius>
+              <length>4</length>
+            </cylinder>
+          </geometry>
+
+          <material>
+            <ambient>0.2 0.3 0.8 1</ambient>
+            <diffuse>0.2 0.3 0.8 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- Obstacle 3: tall cylinder at the back. -->
+
+    <model name="obstacle_3">
+      <static>true</static>
+      <pose>26 22 6 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>2</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>2</radius>
+              <length>12</length>
+            </cylinder>
+          </geometry>
+
+          <material>
+            <ambient>0.8 0.4 0.1 1</ambient>
+            <diffuse>0.8 0.4 0.1 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- Obstacle 4: short cylinder. -->
+
+    <model name="obstacle_4">
+      <static>true</static>
+      <pose>4 19 1.5 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>1.2</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>1.2</radius>
+              <length>3</length>
+            </cylinder>
+          </geometry>
+
+          <material>
+            <ambient>0.8 0.1 0.4 1</ambient>
+            <diffuse>0.8 0.1 0.4 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- ===================================================== -->
+    <!-- BUILDING                                              -->
+    <!-- ===================================================== -->
+
+    <model name="building">
+      <static>true</static>
+
+      <!-- Building: 6 m x 6 m x 5 m -->
+
+      <pose>3 24 2.5 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 6 5</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 6 5</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.4 0.4 0.4 1</ambient>
+            <diffuse>0.4 0.4 0.4 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- ===================================================== -->
+    <!-- WALLS                                                 -->
+    <!-- ===================================================== -->
+
+    <!-- Wall 1: long wall with a passage at the center. -->
+
+    <model name="wall_1_left">
+      <static>true</static>
+      <pose>9 22 2 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <model name="wall_1_right">
+      <static>true</static>
+      <pose>18 22 2 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- Wall 2: narrow corridor. -->
+
+    <model name="wall_2_left">
+      <static>true</static>
+      <pose>20 5 2 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <model name="wall_2_right">
+      <static>true</static>
+      <pose>27 5 2 0 0 0</pose>
+
+      <link name="link">
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 8 4</size>
+            </box>
+          </geometry>
+
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <!-- ===================================================== -->
+    <!-- END                                                   -->
+    <!-- ===================================================== -->
+
+  </world>
+</sdf>

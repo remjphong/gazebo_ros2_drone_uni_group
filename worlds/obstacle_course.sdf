@@ -114,10 +114,10 @@
       <pose>10.0 9.5 0.15 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
           <material>
             <ambient>0.1 0.4 0.1 1</ambient>
             <diffuse>0.1 0.4 0.1 1</diffuse>
@@ -130,10 +130,10 @@
       <pose>14.0 9.5 0.15 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
           <material>
             <ambient>0.1 0.4 0.1 1</ambient>
             <diffuse>0.1 0.4 0.1 1</diffuse>
@@ -146,10 +146,10 @@
       <pose>18.0 9.5 0.15 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
           <material>
             <ambient>0.1 0.4 0.1 1</ambient>
             <diffuse>0.1 0.4 0.1 1</diffuse>
@@ -162,10 +162,10 @@
       <pose>22.0 9.5 0.15 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>1.0 15.0 0.3</size></box></geometry>
+          <geometry><box><size>1.0 15.0 4</size></box></geometry>
           <material>
             <ambient>0.1 0.4 0.1 1</ambient>
             <diffuse>0.1 0.4 0.1 1</diffuse>
