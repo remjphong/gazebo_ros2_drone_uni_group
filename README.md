@@ -46,3 +46,7 @@ return_to_launch_after_mission, and safety timeouts.
 The drone connects, uploads the mission, follows
 the waypoints, and returns/lands according to
 the configured mission behavior.
+
+## SITL handoff
+
+[Hướng dẫn chạy lại và kết quả của Phong](docs/phong-sitl-handoff.md)
