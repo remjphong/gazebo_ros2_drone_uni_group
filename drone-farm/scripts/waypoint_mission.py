@@ -149,126 +149,105 @@ def build_mission(home_lat, home_lon, mission_config):
 
     return MissionPlan(mission_items)
     
+# PHONG_WAYPOINT_TIMEOUT_AND_LANDING
+async def first_matching(stream, predicate):
+    async for sample in stream:
+        if predicate(sample):
+            return sample
+    raise RuntimeError("Telemetry stream ended before the expected state.")
+
+
 async def monitor_progress(drone):
     last_progress = None
-
     async for progress in drone.mission.mission_progress():
         current = (progress.current, progress.total)
-
         if current != last_progress:
-            print(
-                f"Mission progress: "
-                f"{progress.current}/{progress.total}"
-            )
+            print(f"MISSION_PROGRESS={progress.current}/{progress.total}")
             last_progress = current
-
         if progress.total > 0 and progress.current >= progress.total:
-            print("Mission waypoints completed.")
             return
+    raise RuntimeError("Mission progress stream ended early.")
 
 
 async def monitor_landing(drone):
-    was_airborne = False
+    await first_matching(drone.telemetry.in_air(), bool)
+    print("AIRBORNE_CONFIRMED=1")
+    await first_matching(drone.telemetry.in_air(), lambda in_air: not in_air)
+    print("LANDING_CONFIRMED=1")
+    await first_matching(drone.telemetry.armed(), lambda armed: not armed)
+    print("DISARM_CONFIRMED=1")
 
-    async for in_air in drone.telemetry.in_air():
-        if in_air:
-            was_airborne = True
-        elif was_airborne:
-            print("Landing confirmed by telemetry.")
-            return
+
+def horizontal_distance_m(home, position):
+    radius = 6378137.0
+    dlat = math.radians(position.latitude_deg - home.latitude_deg)
+    dlon = math.radians(position.longitude_deg - home.longitude_deg)
+    cos_lat = math.cos(math.radians(home.latitude_deg))
+    return radius * math.hypot(dlat, dlon * cos_lat)
+
+
+async def run_mission(drone, mission_config, plan, home):
+    await drone.mission.set_return_to_launch_after_mission(
+        mission_config["return_to_launch_after_mission"]
+    )
+    await drone.mission.upload_mission(plan)
+    print("MISSION_UPLOADED=1")
+
+    async with asyncio.TaskGroup() as tasks:
+        tasks.create_task(monitor_progress(drone))
+        tasks.create_task(monitor_landing(drone))
+        await drone.action.arm()
+        print("ARM_ACCEPTED=1")
+        await drone.mission.start_mission()
+        print("MISSION_STARTED=1")
+
+    position = await first_matching(
+        drone.telemetry.position(),
+        lambda sample: all(map(math.isfinite, (sample.latitude_deg, sample.longitude_deg))),
+    )
+    error = horizontal_distance_m(home, position)
+    print(f"HOME_ERROR_M={error:.3f}")
+    if mission_config["return_to_launch_after_mission"] and error > 2.0:
+        raise RuntimeError(f"Landing exceeded the 2.0 m home tolerance: {error:.3f} m.")
 
 
 async def main():
-
     config = load_config()
-
     connection = config["connection"]
-    mission_config = config["mission"]
+    mission = config["mission"]
     safety = config["safety"]
 
     drone = System()
-
-    try:
-        await wait_for_connection(drone, connection)
-        home_lat, home_lon = await get_initial_position(drone, safety)
-
-        mission_plan = build_mission(
-	    home_lat,
-	    home_lon,
-	    mission_config,
-	)
-        # Set this before uploading the mission.
-        await drone.mission.set_return_to_launch_after_mission(
-	    mission_config["return_to_launch_after_mission"]
-	)
-        print("[3] Uploading mission...")
-
-        await drone.mission.upload_mission(mission_plan)
-
-        print("Mission uploaded successfully.")
-
-        print("[4] Arming...")
-
-        await drone.action.arm()
-
-        print("Arm command accepted.")
-
-        print("[5] Starting mission...")
-
-        await drone.mission.start_mission()
-
-        print("Mission start command accepted.")
-
-        progress_task = asyncio.create_task(
-            monitor_progress(drone)
-        )
-
-        landing_task = asyncio.create_task(
-            monitor_landing(drone)
-        )
-
-        done, pending = await asyncio.wait(
-            [progress_task, landing_task],
-            return_when=asyncio.FIRST_EXCEPTION,
-        )
-
-        for task in done:
-            exception = task.exception()
-
-            if exception is not None:
-                raise exception
-
-        # If mission progress finishes first, continue waiting for landing.
-        if progress_task in done and not landing_task.done():
-            await landing_task
-
-        # If landing is observed first, verify mission progress as well.
-        if landing_task in done and not progress_task.done():
-            try:
-                await asyncio.wait_for(progress_task, timeout=5)
-            except asyncio.TimeoutError:
-                print(
-                    "WARNING: Landed, but mission completion "
-                    "was not confirmed."
-                )
-
-        for task in pending:
-            task.cancel()
-
-        await asyncio.gather(*pending, return_exceptions=True)
-
-        print("Mission test finished.")
-
-    except asyncio.TimeoutError:
-        print("ERROR: Timeout while waiting for PX4 or mission.")
-
-    except Exception as error:
-        print(f"ERROR: {type(error).__name__}: {error}")
-        print(
-            "Inspect PX4 and Gazebo before retrying. "
-            "Do not assume the drone has landed."
-        )
+    await asyncio.wait_for(
+        wait_for_connection(drone, connection),
+        timeout=connection["timeout_seconds"],
+    )
+    lat, lon = await asyncio.wait_for(
+        get_initial_position(drone, safety),
+        timeout=safety["global_position_timeout_seconds"],
+    )
+    home = await asyncio.wait_for(
+        first_matching(
+            drone.telemetry.home(),
+            lambda sample: all(map(math.isfinite, (sample.latitude_deg, sample.longitude_deg))),
+        ),
+        timeout=10,
+    )
+    print(f"HOME_LAT_LON={home.latitude_deg:.7f},{home.longitude_deg:.7f}")
+    plan = build_mission(lat, lon, mission)
+    await asyncio.wait_for(
+        run_mission(drone, mission, plan, home),
+        timeout=safety["mission_timeout_seconds"],
+    )
+    print("WAYPOINT_MISSION=PASS")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as error:
+        import traceback
+
+        traceback.print_exception(error)
+        print("WAYPOINT_MISSION=FAIL", flush=True)
+        raise SystemExit(1) from error
