@@ -91,3 +91,17 @@ Log gốc và ULog nằm trên máy chạy SITL. Hồ sơ cuối cần lưu các
 - Chạy lại từ checkout sạch trên máy thành viên khác và ghi commit, log, người chạy.
 - Nối bộ nhận RTL, telemetry và quy tắc chặn upload vào tiến trình B dùng chung. Kiểm tra với đầu vào giao theo [Issue #1](https://github.com/remjphong/gazebo_ros2_drone_uni_group/issues/1).
 - Chốt và lưu log, video chính/dự phòng cùng Khánh. Camera cần kiểm thử nếu ca chung dùng nguồn ảnh.
+
+## Kiểm thử trên world nông trại 5 ha
+
+World dùng `farm_5ha_project` từ gói `farm_5ha_project.zip`. Các kết quả dưới đây ghi nhận trên máy SITL của Phong.
+
+| Ca | Kết quả |
+| --- | --- |
+| X500 ở bãi chính | 4/4 waypoint, hạ cánh và disarm. Sai số home 0,035 m. |
+| Cảm biến tham chiếu | LiDAR 361 tia, 35 giá trị dương hữu hạn. RGB 640 × 480 có dữ liệu. |
+| X500 LiDAR ở bãi phụ | Topic `/world/farm_5ha_project/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan` phát 1.080 tia. Mặt cản gần nhất phía trước 22,878 m. |
+| Tuyến vòng tham chiếu, lượt đầu | Controller timeout ở 6/8 với giới hạn 240 giây thực. ULog `11_58_01.ulg` xác nhận PX4 hoàn tất và disarm. Cận dưới khoảng hở ngang theo quỹ đạo ước lượng là 4,138 m. |
+| Cùng tuyến, lượt chạy lại | Controller theo dõi đủ 8/8, hạ cánh/disarm, mã thoát 0, sai số home 0,045 m. Thời lượng 314 giây thực, timeout thử 480 giây. ULog `12_10_32.ulg`. |
+
+Hai lượt dùng tuyến vòng tham chiếu của world. Lượt 480 giây dùng cấu hình thử riêng. Ca lập tuyến từ scan live trên world nông trại và việc tái lập trên máy thành viên khác vẫn cần bằng chứng riêng.
