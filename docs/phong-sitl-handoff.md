@@ -31,7 +31,37 @@ if ss -H -lntu | awk '$5 ~ /:(14540|50051)$/ {print; used=1} END {exit !used}'; 
 fi
 timeout 8s gz topic -l >"$checkout/topics.txt"
 grep -Fx '/world/baylands/clock' "$checkout/topics.txt"
-timeout --kill-after=5s 300s "$python" -u "$checkout/drone-farm/scripts/waypoint_mission.py" 2>&1 | tee "$checkout/mission.log"
+server="$("$python" -c 'from pathlib import Path; import mavsdk_grpc; print(Path(mavsdk_grpc.__file__).resolve().parent / "bin/mavsdk_server")')"
+"$server" -p 50051 --sysid 245 --compid 190 udpin://0.0.0.0:14540 >"$checkout/mavsdk-server.log" 2>&1 &
+server_pid=$!
+cleanup() {
+    kill -TERM "$server_pid" 2>/dev/null || true
+    for _ in {1..5}; do
+        kill -0 "$server_pid" 2>/dev/null || break
+        sleep 1
+    done
+    kill -KILL "$server_pid" 2>/dev/null || true
+    wait "$server_pid" 2>/dev/null || true
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+"$python" - "$checkout" <<'PY'
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+script = root / "drone-farm/scripts/waypoint_mission.py"
+source = script.read_text(encoding="utf-8")
+old = "    drone = System()"
+if source.count(old) != 1:
+    raise SystemExit("BLOCKED: controller không khớp phiên bản trong hướng dẫn.")
+source = source.replace(old, '    drone = System(mavsdk_server_address="127.0.0.1", port=50051)', 1)
+copy = script.with_name("waypoint_handoff_run.py")
+compile(source, str(copy), "exec")
+copy.write_text(source, encoding="utf-8")
+PY
+timeout --kill-after=5s 300s "$python" -u "$checkout/drone-farm/scripts/waypoint_handoff_run.py" 2>&1 | tee "$checkout/mission.log"
 grep -Fx 'MISSION_PROGRESS=4/4' "$checkout/mission.log"
 grep -Fx 'LANDING_CONFIRMED=1' "$checkout/mission.log"
 grep -Fx 'DISARM_CONFIRMED=1' "$checkout/mission.log"
