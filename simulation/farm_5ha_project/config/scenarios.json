@@ -1,0 +1,143 @@
+{
+  "frame": "Gazebo world ENU metres, original SDF origin",
+  "farm_bounds_xy": [
+    -100,
+    100,
+    -125,
+    125
+  ],
+  "homes": {
+    "main_pad": [
+      -119,
+      -151,
+      0.35
+    ],
+    "east_pad": [
+      54,
+      -165,
+      0.35
+    ]
+  },
+  "coverage": {
+    "home": "main_pad",
+    "roi_xy": [
+      -92,
+      -68,
+      -110,
+      -86
+    ],
+    "example_world_waypoints": [
+      [
+        -90,
+        -108,
+        5
+      ],
+      [
+        -90,
+        -88,
+        5
+      ],
+      [
+        -80,
+        -88,
+        5
+      ],
+      [
+        -80,
+        -108,
+        5
+      ],
+      [
+        -70,
+        -108,
+        5
+      ],
+      [
+        -70,
+        -88,
+        5
+      ]
+    ]
+  },
+  "approach": {
+    "home": "east_pad",
+    "target_id": "crop_severe_r03_c16",
+    "target_world_xyz": [
+      65,
+      -90,
+      0
+    ],
+    "observation_world_xyz": [
+      65,
+      -90,
+      9
+    ]
+  },
+  "detour": {
+    "home": "east_pad",
+    "start_world_xyz": [
+      60,
+      -165,
+      5
+    ],
+    "goal_world_xyz": [
+      92,
+      -165,
+      5
+    ],
+    "reference_world_waypoints": [
+      [
+        60,
+        -165,
+        5
+      ],
+      [
+        70,
+        -157,
+        5
+      ],
+      [
+        88,
+        -157,
+        5
+      ],
+      [
+        92,
+        -165,
+        5
+      ]
+    ],
+    "obstacle": "integration_tall_obstacle"
+  },
+  "no_path": {
+    "restricted_roi_xy": [
+      90,
+      106,
+      -153,
+      -145
+    ],
+    "obstacle": "integration_blocked_lane_wall",
+    "start_world_xyz": [
+      92,
+      -149,
+      5
+    ],
+    "goal_world_xyz": [
+      104,
+      -149,
+      5
+    ],
+    "expected": "no route in the bounded workspace"
+  },
+  "no_target": {
+    "mock_targets": []
+  },
+  "low_energy": {
+    "input_source": "mock to coordinator",
+    "home": "main_pad"
+  },
+  "reference_topics": {
+    "lidar": "/farm_5ha/reference/scan",
+    "rgb": "/farm_5ha/reference/image"
+  }
+}
