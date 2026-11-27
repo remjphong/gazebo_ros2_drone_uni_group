@@ -1,32 +1,28 @@
-# Mission configuration for PX4 SITL + Gazebo
-
 connection:
-  address: "udpin://0.0.0.0:14540"
-  timeout_seconds: 20
+  address: "udp://:14540"
+  timeout_seconds: 30
 
 mission:
-  altitude_m: 5.0
-  speed_m_s: 2.0
-
-  # Return to launch after completing all waypoints.
+  altitude_m: 20.0
+  speed_m_s: 4.0
   return_to_launch_after_mission: true
-
-  # Local offsets relative to the initial GPS position.
-  # north_m: positive = north
-  # east_m: positive = east
   waypoints:
-    - north_m: 0.0
-      east_m: 5.0
-
-    - north_m: 8.0
-      east_m: 5.0
-
-    - north_m: 8.0
+    - north_m: -120.0
+      east_m: -100.0
+    - north_m: -100.0
+      east_m: -100.0
+    - north_m: -100.0
+      east_m: -60.0
+    - north_m: -90.0
+      east_m: -60.0
+    - north_m: -90.0
+      east_m: -40.0
+    - north_m: -80.0
+      east_m: -40.0
+    - north_m: -80.0
       east_m: 0.0
-
     - north_m: 0.0
       east_m: 0.0
 
 safety:
-  global_position_timeout_seconds: 60
-  mission_timeout_seconds: 180
+  global_position_timeout_seconds: 30

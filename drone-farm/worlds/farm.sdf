@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="farm_world">
+    <!-- Cài đặt vật lý và môi trường cơ bản của Gazebo -->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+
+    <!-- Ánh sáng -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Mặt đất màu xanh lá (Cánh đồng) -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+          <material>
+            <ambient>0.2 0.5 0.2 1</ambient> <!-- Màu xanh lá -->
+            <diffuse>0.2 0.5 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Điểm sâu bệnh 1 (Nằm ở tọa độ x=3, y=3) -->
+    <model name="disease_spot_1">
+      <static>true</static>
+      <pose>3 3 0.05 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>1 1 0.01</size></box></geometry>
+          <material>
+            <ambient>0.5 0.25 0 1</ambient> <!-- Màu nâu -->
+            <diffuse>0.5 0.25 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Điểm sâu bệnh 2 (Nằm ở tọa độ x=3, y=-3) -->
+    <model name="disease_spot_2">
+      <static>true</static>
+      <pose>3 -3 0.05 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>1.5 1.5 0.01</size></box></geometry>
+          <material>
+            <ambient>0.4 0.2 0.1 1</ambient>
+            <diffuse>0.4 0.2 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Điểm sâu bệnh 3 (Nằm ở tọa độ x=-2, y=4) -->
+    <model name="disease_spot_3">
+      <static>true</static>
+      <pose>-2 4 0.05 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.8 0.8 0.01</size></box></geometry>
+          <material>
+            <ambient>0.6 0.3 0 1</ambient>
+            <diffuse>0.6 0.3 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
