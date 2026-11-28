@@ -18,8 +18,13 @@ setup(
             os.path.join("share", package_name, "config"),
             glob("config/*.yaml")
         ),
+        (
+            os.path.join("share", package_name, "test"),
+            glob("test/*.py")
+        ),
     ],
     install_requires=["setuptools"],
+    tests_require=["pytest"],
     zip_safe=True,
     maintainer="Drone Farm Team",
     maintainer_email="student@example.com",
